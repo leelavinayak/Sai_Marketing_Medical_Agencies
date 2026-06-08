@@ -5,10 +5,33 @@ import bcrypt from "bcryptjs";
 import "dotenv/config";
 
 const host = process.env.MYSQL_HOST || "localhost";
-const port = parseInt(process.env.MYSQL_PORT || "3306");
+const port = parseInt(process.env.MYSQL_PORT || "3306", 10);
 const user = process.env.MYSQL_USER || "root";
 const password = process.env.MYSQL_PASSWORD || "";
 const database = process.env.MYSQL_DATABASE || "sai_marketing_db";
+const isProduction = process.env.NODE_ENV === "production";
+
+if (isProduction) {
+  const missing = [];
+  if (!process.env.MYSQL_HOST) missing.push("MYSQL_HOST");
+  if (!process.env.MYSQL_PORT) missing.push("MYSQL_PORT");
+  if (!process.env.MYSQL_USER) missing.push("MYSQL_USER");
+  if (!process.env.MYSQL_PASSWORD) missing.push("MYSQL_PASSWORD");
+  if (!process.env.MYSQL_DATABASE) missing.push("MYSQL_DATABASE");
+
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required production database environment variables: ${missing.join(", ")}. ` +
+      `Render does not provide a local MySQL instance by default. Set these values in the Render dashboard.`
+    );
+  }
+
+  if (["localhost", "127.0.0.1", "::1"].includes(host)) {
+    throw new Error(
+      "MYSQL_HOST cannot be localhost in production. Use a remote MySQL host or Render managed database and set MYSQL_HOST to the service host."
+    );
+  }
+}
 
 export let pool: mysql.Pool;
 
