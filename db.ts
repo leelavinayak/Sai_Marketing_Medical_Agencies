@@ -37,7 +37,7 @@ export let pool: mysql.Pool;
 
 export async function initDatabase() {
   console.log("Initializing database connection...");
-  
+
   // Connect without database selected to make sure DB exists
   const connection = await mysql.createConnection({
     host,
