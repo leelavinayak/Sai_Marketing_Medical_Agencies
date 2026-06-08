@@ -1,0 +1,244 @@
+{
+  "credentials": {
+    "username": "admin",
+    "passwordHash": "$2b$10$GJfgcHVln0ctCedpHgRMrOQjZLNvvKHBAZSDsPIy3POuZ0zr3FS6y"
+  },
+  "settings": {
+    "companyName": "Sai Marketing Medical Agencies",
+    "ownerName": "Murali Krishna",
+    "phone": "+91 85230 86151",
+    "email": "[EMAIL_ADDRESS]",
+    "address": "D.No. 10-5-268, Doddapuram Street, Reddy and Reddy's Colony, Tirupati, Andhra Pradesh – 517501, India",
+    "whatsappNumber": "+918523086151",
+    "facebookUrl": "https://facebook.com/saimarketing",
+    "twitterUrl": "https://twitter.com/saimarketing",
+    "linkedinUrl": "https://linkedin.com/company/sai-marketing-medical-agencies",
+    "officeHours": "Monday - Saturday: 9:00 AM - 8:00 PM (Sunday Closed)",
+    "announcement": "Serving the medical and healthcare retail distribution needs in Andhra Pradesh with high quality, competitive pricing, and swift delivery."
+  },
+  "categories": [
+    {
+      "id": "cat_1",
+      "name": "Medical Supplies",
+      "slug": "medical-supplies",
+      "description": "Quality hospital consumables, disposables, surgical gloves, syringes, and clinical hygiene supplies.",
+      "image": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "cat_2",
+      "name": "Pharmaceutical Products",
+      "slug": "pharmaceutical-products",
+      "description": "Essential bulk medicines, capsules, active tablets, vitamin pills, and healthcare syrup distributions.",
+      "image": "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "cat_3",
+      "name": "General Chemicals",
+      "slug": "general-chemicals",
+      "description": "Laboratory diagnostic reagents, certified industrial cleaning grades, and wholesale analytical chemicals.",
+      "image": "https://images.unsplash.com/photo-1532187863486-abf9d39d66e8?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "cat_4",
+      "name": "Household Goods",
+      "slug": "household-goods",
+      "description": "Commercial Grade disinfectants, sanitizers, floor liquid cleaners, detergents, and household plastics.",
+      "image": "https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "cat_5",
+      "name": "Healthcare Essentials",
+      "slug": "healthcare-essentials",
+      "description": "Digital medical devices, contactless thermometers, pulse oximeters, BP monitors, and protective PPE sets.",
+      "image": "https://images.unsplash.com/photo-1603398938378-e54eab446dde?auto=format&fit=crop&q=80&w=600"
+    },
+    {
+      "id": "cat_6",
+      "name": "Wholesale Distribution Products",
+      "slug": "wholesale-distribution",
+      "description": "Heavy duty hospital beds, adjustable stretchers, robust IV therapy stands, and wholesale bulk packing crates.",
+      "image": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=600"
+    }
+  ],
+  "products": [
+    {
+      "id": "prod_1",
+      "name": "Disposable Nitrile Examination Gloves",
+      "category": "medical-supplies",
+      "description": "Medical-grade exam gloves, powder-free, latex-free, superior puncture resistance. Hand protection for doctors, nurses, and laboratory personnel.",
+      "image": "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=600",
+      "price": "Wholesale Contact Only",
+      "inStock": true,
+      "isFeatured": true,
+      "packSize": "Box of 100 pcs",
+      "manufacturer": "Sai Secure Poly Products"
+    },
+    {
+      "id": "prod_2",
+      "name": "Surgical Face Masks (3-Ply Layer)",
+      "category": "medical-supplies",
+      "description": "High filtration efficiency 3-ply surgical masks with robust nose clip and comfortable stretch earloops. Fluids repellent certified.",
+      "image": "https://images.unsplash.com/photo-1586942593568-293a1a72e9a5?auto=format&fit=crop&q=80&w=600",
+      "price": "Bulk Pack Discounts",
+      "inStock": true,
+      "isFeatured": true,
+      "packSize": "Carton of 50 packs (2500 pcs)",
+      "manufacturer": "SurgeCare Industries"
+    },
+    {
+      "id": "prod_3",
+      "name": "Paracetamol Tablets IP 500mg (Bulk Box)",
+      "category": "pharmaceutical-products",
+      "description": "Analgesic and antipyretic tablets manufactured under strict GMP certified facilities. Available for pharmacy bulk replenishment.",
+      "image": "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=600",
+      "price": "Wholesale Rates",
+      "inStock": true,
+      "isFeatured": true,
+      "packSize": "100 Blister Strips (1000 Tablets)",
+      "manufacturer": "AuroPharma Labs Ltd."
+    },
+    {
+      "id": "prod_4",
+      "name": "Amoxicillin Capsules BP 500mg",
+      "category": "pharmaceutical-products",
+      "description": "Broad-spectrum beta-lactam antibiotic capsule wholesale pack for medical retailers, clinical supply chains.",
+      "image": "https://images.unsplash.com/photo-1628771065518-0d82f1938462?auto=format&fit=crop&q=80&w=600",
+      "price": "Inquire for Best Price",
+      "inStock": true,
+      "isFeatured": false,
+      "packSize": "50 Strips (500 Capsules)",
+      "manufacturer": "Cipla Med Distributors"
+    },
+    {
+      "id": "prod_5",
+      "name": "Laboratory Isopropyl Alcohol 99% Pure",
+      "category": "general-chemicals",
+      "description": "99% High Concentration IPA solvent widely utilized as an antiseptic agent, solvent extraction agent, and diagnostic reagent.",
+      "image": "https://images.unsplash.com/photo-1612190801446-c21d1396a504?auto=format&fit=crop&q=80&w=600",
+      "price": "₹3,400 per Drum",
+      "inStock": true,
+      "isFeatured": true,
+      "packSize": "25 Litres Drum",
+      "manufacturer": "Sai Chemicals Tirupati"
+    },
+    {
+      "id": "prod_6",
+      "name": "Sai Premium Concentrated Liquid Detergent",
+      "category": "household-goods",
+      "description": "Heavy stain-removing bulk liquid washing formula tailored for hospital laundry, hotel linen cleaning and medical aprons. Skin friendly.",
+      "image": "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&q=80&w=600",
+      "price": "₹650 per Can",
+      "inStock": true,
+      "isFeatured": true,
+      "packSize": "5 Litres Canister",
+      "manufacturer": "Sai Marketing Cleaning Solts"
+    },
+    {
+      "id": "prod_7",
+      "name": "Contactless Digital Infrared Thermometer",
+      "category": "healthcare-essentials",
+      "description": "High-grade optical sensor for instant, accurate forehead temperature scans. Multiple memory logs, warning fever buzzer alert.",
+      "image": "https://images.unsplash.com/photo-1590486803833-1c5dc8ddd4c8?auto=format&fit=crop&q=80&w=600",
+      "price": "₹1,150 / piece",
+      "inStock": true,
+      "isFeatured": false,
+      "packSize": "Individual Box",
+      "manufacturer": "Oron Diagnostics"
+    },
+    {
+      "id": "prod_8",
+      "name": "Adjustable Hospital IV Drip Stands",
+      "category": "wholesale-distribution",
+      "description": "Stainless steel rust-free IV stands on smooth-rolling premium locking casters. Height adjustable, dual hook hangers for clinics.",
+      "image": "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=600",
+      "price": "Wholesale Quote Only",
+      "inStock": true,
+      "isFeatured": false,
+      "packSize": "Single Pack",
+      "manufacturer": "Tirupati MedTech Fabrication"
+    }
+  ],
+  "gallery": [
+    {
+      "id": "gal_1",
+      "url": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800",
+      "title": "Our Main Wholesale Warehouse Logistics",
+      "category": "Warehouse",
+      "createdAt": "2026-06-07T15:11:30.852Z"
+    },
+    {
+      "id": "gal_2",
+      "url": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=800",
+      "title": "Sai Marketing Agencies Corporate Office",
+      "category": "Office",
+      "createdAt": "2026-06-07T15:11:30.853Z"
+    },
+    {
+      "id": "gal_3",
+      "url": "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=800",
+      "title": "Bulk Pharmaceutical Stock Consignments",
+      "category": "Products",
+      "createdAt": "2026-06-07T15:11:30.853Z"
+    },
+    {
+      "id": "gal_4",
+      "url": "https://images.unsplash.com/photo-1579684389782-64d84b5e901a?auto=format&fit=crop&q=80&w=800",
+      "title": "Rigorous Safety Checking & Distribution Operations",
+      "category": "Operations",
+      "createdAt": "2026-06-07T15:11:30.853Z"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "test_1",
+      "name": "Dr. R. K. Prasad",
+      "role": "Chief Medical Administrator",
+      "company": "Venkateswara Super Speciality Hospital, Tirupati",
+      "feedback": "Sai Marketing Medical Agencies has been our primary medical and chemical supplier for over 5 years. Their bulk deliveries are always on schedule, and the quality of safety materials like gloves and masks is stellar.",
+      "rating": 5,
+      "createdAt": "2026-06-07T15:11:30.853Z"
+    },
+    {
+      "id": "test_2",
+      "name": "S. Lakshmi",
+      "role": "Managing Director",
+      "company": "Tirupati Pharma Care Retailers",
+      "feedback": "Murali Krishna and his team provide unmatched wholesale prices for pharmaceutical and cleaning chemical items. Their customer support response rate on WhatsApp is extremely fast and reassuring.",
+      "rating": 5,
+      "createdAt": "2026-06-07T15:11:30.853Z"
+    },
+    {
+      "id": "test_3",
+      "name": "K. Raghavan",
+      "role": "Director of Operations",
+      "company": "Chittoor Lab Reagents Ltd",
+      "feedback": "Finding high-grade laboratory chemicals locally is tough, but Sai Marketing consistently stocks essential reagents. Their delivery speeds saves our laboratories critical downtime.",
+      "rating": 4,
+      "createdAt": "2026-06-07T15:11:30.853Z"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "inq_1",
+      "name": "Anand Kumar",
+      "phone": "+91 94405 12543",
+      "email": "anand.medicalstore@gmail.com",
+      "companyName": "Anand Retail Drugs Tirupati",
+      "message": "Requesting a wholesale price catalog for Paracetamol 500mg, Amoxicillin capsules, and box of 100 Nitrile gloves. Need delivery. Thank you.",
+      "products": [
+        {
+          "productId": "prod_1",
+          "productName": "Disposable Nitrile Examination Gloves",
+          "quantity": 20
+        },
+        {
+          "productId": "prod_3",
+          "productName": "Paracetamol Tablets IP 500mg (Bulk Box)",
+          "quantity": 15
+        }
+      ],
+      "status": "pending",
+      "createdAt": "2026-06-07T15:11:30.853Z"
+    }
+  ]
+}
