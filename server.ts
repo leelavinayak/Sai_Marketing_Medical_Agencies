@@ -7,7 +7,7 @@ import { createServer as createViteServer } from "vite";
 import { pool, initDatabase } from "./db.js";
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "sai_marketing_secure_jwt_secret_token_12216";
 
 app.use(express.json({ limit: "50mb" }));
@@ -190,7 +190,7 @@ app.get("/api/admin/customers/:id", authenticateToken, async (req, res) => {
 
     const cleanInput = customer.phone.replace(/[^\d]/g, "");
     const [inqRows] = await pool.query<any[]>("SELECT id, name, phone, email, company_name as companyName, message, status, admin_notes as adminNotes, calling_confirmed as callingConfirmed, created_at as createdAt FROM inquiries ORDER BY created_at DESC");
-    
+
     const matchedInquiries = [];
     for (const inq of inqRows) {
       const cleanInqPhone = inq.phone.replace(/[^\d]/g, "");
@@ -231,14 +231,14 @@ app.get("/api/customer-inquiries/:phone", async (req, res) => {
     if (!phone) {
       return res.status(400).json({ error: "Phone number is required." });
     }
-    
+
     const cleanInput = phone.replace(/[^\d]/g, "");
     if (!cleanInput) {
       return res.json([]);
     }
-    
+
     const [inqRows] = await pool.query<any[]>("SELECT id, name, phone, email, company_name as companyName, message, status, admin_notes as adminNotes, calling_confirmed as callingConfirmed, created_at as createdAt FROM inquiries ORDER BY created_at DESC");
-    
+
     const matchedInquiries = [];
     for (const inq of inqRows) {
       const cleanInqPhone = inq.phone.replace(/[^\d]/g, "");
@@ -251,7 +251,7 @@ app.get("/api/customer-inquiries/:phone", async (req, res) => {
         });
       }
     }
-    
+
     res.json(matchedInquiries);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
