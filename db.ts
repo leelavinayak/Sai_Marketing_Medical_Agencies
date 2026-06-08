@@ -1,189 +1,244 @@
-import mysql from "mysql2/promise";
+import mongoose, { Schema } from "mongoose";
 import fs from "fs";
 import path from "path";
 import bcrypt from "bcryptjs";
 import "dotenv/config";
 
-const host = process.env.MYSQL_HOST || "localhost";
-const port = parseInt(process.env.MYSQL_PORT || "3306", 10);
-const user = process.env.MYSQL_USER || "root";
-const password = process.env.MYSQL_PASSWORD || "";
-const database = process.env.MYSQL_DATABASE || "sai_marketing_db";
 const isProduction = process.env.NODE_ENV === "production";
+const MONGODB_URI = process.env.MONGODB_URI;
 
-if (isProduction) {
-  const missing = [];
-  if (!process.env.MYSQL_HOST) missing.push("MYSQL_HOST");
-  if (!process.env.MYSQL_PORT) missing.push("MYSQL_PORT");
-  if (!process.env.MYSQL_USER) missing.push("MYSQL_USER");
-  if (!process.env.MYSQL_PASSWORD) missing.push("MYSQL_PASSWORD");
-  if (!process.env.MYSQL_DATABASE) missing.push("MYSQL_DATABASE");
-
-  if (missing.length > 0) {
-    throw new Error(
-      `Missing required production database environment variables: ${missing.join(", ")}. ` +
-      `Render does not provide a local MySQL instance by default. Set these values in the Render dashboard.`
-    );
-  }
-
-  if (["localhost", "127.0.0.1", "::1"].includes(host)) {
-    throw new Error(
-      "MYSQL_HOST cannot be localhost in production. Use a remote MySQL host or Render managed database and set MYSQL_HOST to the service host."
-    );
-  }
+if (isProduction && !MONGODB_URI) {
+  throw new Error(
+    "Missing required production MONGODB_URI environment variable. " +
+    "Render does not provide a local MongoDB instance. Set this value in your environment (e.g. MongoDB Atlas URI)."
+  );
 }
 
-export let pool: mysql.Pool;
+const activeMongodbUri = MONGODB_URI || "mongodb://localhost:27017/sai_marketing_db";
+
+// -------------------------------------------------------------
+// INTERFACES
+// -------------------------------------------------------------
+
+export interface IAdminCredential {
+  username: string;
+  passwordHash: string;
+}
+
+export interface ISetting {
+  companyName?: string;
+  ownerName?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  whatsappNumber?: string;
+  facebookUrl?: string;
+  twitterUrl?: string;
+  linkedinUrl?: string;
+  officeHours?: string;
+  announcement?: string;
+}
+
+export interface ICategory {
+  id: string;
+  name?: string;
+  slug?: string;
+  description?: string;
+  image?: string;
+}
+
+export interface IProduct {
+  id: string;
+  name: string;
+  category?: string;
+  description?: string;
+  image?: string;
+  price?: string;
+  inStock?: boolean;
+  isFeatured?: boolean;
+  packSize?: string;
+  manufacturer?: string;
+  chemicalFormula?: string;
+  createdAt?: string;
+}
+
+export interface ICustomer {
+  id: string;
+  name?: string;
+  phone: string;
+  password?: string;
+  companyName?: string;
+  email?: string;
+  createdAt?: string;
+}
+
+export interface IInquiryProduct {
+  productId?: string;
+  productName?: string;
+  quantity?: number;
+}
+
+export interface IInquiry {
+  id: string;
+  name?: string;
+  phone?: string;
+  email?: string;
+  companyName?: string;
+  message?: string;
+  status?: string;
+  adminNotes?: string;
+  callingConfirmed?: boolean;
+  products?: IInquiryProduct[];
+  createdAt?: string;
+}
+
+export interface IGalleryImage {
+  id: string;
+  url?: string;
+  title?: string;
+  category?: string;
+  createdAt?: string;
+}
+
+export interface ITestimonial {
+  id: string;
+  name?: string;
+  role?: string;
+  company?: string;
+  feedback?: string;
+  rating?: number;
+  createdAt?: string;
+}
+
+// -------------------------------------------------------------
+// SCHEMAS & MODELS
+// -------------------------------------------------------------
+
+// Admin Credentials
+const AdminCredentialSchema = new Schema<IAdminCredential>({
+  username: { type: String, required: true, unique: true },
+  passwordHash: { type: String, required: true }
+});
+export const AdminCredential = mongoose.model<IAdminCredential>("AdminCredential", AdminCredentialSchema, "admin_credentials");
+
+// Settings
+const SettingSchema = new Schema<ISetting>({
+  companyName: String,
+  ownerName: String,
+  phone: String,
+  email: String,
+  address: String,
+  whatsappNumber: String,
+  facebookUrl: String,
+  twitterUrl: String,
+  linkedinUrl: String,
+  officeHours: String,
+  announcement: String
+});
+export const Setting = mongoose.model<ISetting>("Setting", SettingSchema, "settings");
+
+// Categories
+const CategorySchema = new Schema<ICategory>({
+  id: { type: String, required: true, unique: true },
+  name: String,
+  slug: { type: String, unique: true },
+  description: String,
+  image: String
+});
+export const Category = mongoose.model<ICategory>("Category", CategorySchema, "categories");
+
+// Products
+const ProductSchema = new Schema<IProduct>({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  category: String,
+  description: String,
+  image: String,
+  price: String,
+  inStock: { type: Boolean, default: true },
+  isFeatured: { type: Boolean, default: false },
+  packSize: String,
+  manufacturer: String,
+  chemicalFormula: String,
+  createdAt: String
+});
+export const Product = mongoose.model<IProduct>("Product", ProductSchema, "products");
+
+// Customers
+const CustomerSchema = new Schema<ICustomer>({
+  id: { type: String, required: true, unique: true },
+  name: String,
+  phone: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  companyName: String,
+  email: String,
+  createdAt: String
+});
+export const Customer = mongoose.model<ICustomer>("Customer", CustomerSchema, "customers");
+
+// Inquiries (including nested products)
+const InquiryProductSchema = new Schema<IInquiryProduct>({
+  productId: String,
+  productName: String,
+  quantity: Number
+}, { _id: false });
+
+const InquirySchema = new Schema<IInquiry>({
+  id: { type: String, required: true, unique: true },
+  name: String,
+  phone: String,
+  email: String,
+  companyName: String,
+  message: String,
+  status: { type: String, default: "pending" },
+  adminNotes: String,
+  callingConfirmed: { type: Boolean, default: false },
+  products: [InquiryProductSchema],
+  createdAt: String
+});
+export const Inquiry = mongoose.model<IInquiry>("Inquiry", InquirySchema, "inquiries");
+
+// Gallery
+const GalleryImageSchema = new Schema<IGalleryImage>({
+  id: { type: String, required: true, unique: true },
+  url: String,
+  title: String,
+  category: String,
+  createdAt: String
+});
+export const GalleryImage = mongoose.model<IGalleryImage>("GalleryImage", GalleryImageSchema, "gallery");
+
+// Testimonials
+const TestimonialSchema = new Schema<ITestimonial>({
+  id: { type: String, required: true, unique: true },
+  name: String,
+  role: String,
+  company: String,
+  feedback: String,
+  rating: Number,
+  createdAt: String
+});
+export const Testimonial = mongoose.model<ITestimonial>("Testimonial", TestimonialSchema, "testimonials");
+
+// -------------------------------------------------------------
+// INITIALIZATION & SEEDING
+// -------------------------------------------------------------
 
 export async function initDatabase() {
-  console.log("Initializing database connection...");
+  console.log("Connecting to MongoDB at:", activeMongodbUri);
+  await mongoose.connect(activeMongodbUri);
+  console.log("Connected to MongoDB.");
 
-  // Connect without database selected to make sure DB exists
-  const connection = await mysql.createConnection({
-    host,
-    port,
-    user,
-    password
-  });
-
-  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${database}\`;`);
-  await connection.end();
-
-  // Create connection pool with database selected
-  pool = mysql.createPool({
-    host,
-    port,
-    user,
-    password,
-    database,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-  });
-
-  // Create tables
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS admin_credentials (
-      username VARCHAR(255) PRIMARY KEY,
-      password_hash VARCHAR(255) NOT NULL
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS settings (
-      id INT PRIMARY KEY DEFAULT 1,
-      company_name VARCHAR(255),
-      owner_name VARCHAR(255),
-      phone VARCHAR(50),
-      email VARCHAR(255),
-      address TEXT,
-      whatsapp_number VARCHAR(50),
-      facebook_url VARCHAR(255),
-      twitter_url VARCHAR(255),
-      linkedin_url VARCHAR(255),
-      office_hours VARCHAR(255),
-      announcement TEXT,
-      CONSTRAINT single_row CHECK (id = 1)
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS categories (
-      id VARCHAR(50) PRIMARY KEY,
-      name VARCHAR(255),
-      slug VARCHAR(255) UNIQUE,
-      description TEXT,
-      image TEXT
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS products (
-      id VARCHAR(50) PRIMARY KEY,
-      name VARCHAR(255),
-      category VARCHAR(255),
-      description TEXT,
-      image TEXT,
-      price VARCHAR(255),
-      in_stock BOOLEAN,
-      is_featured BOOLEAN,
-      pack_size VARCHAR(255),
-      manufacturer VARCHAR(255),
-      chemical_formula VARCHAR(255),
-      created_at VARCHAR(255)
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS customers (
-      id VARCHAR(50) PRIMARY KEY,
-      name VARCHAR(255),
-      phone VARCHAR(50) UNIQUE,
-      password VARCHAR(255),
-      company_name VARCHAR(255),
-      email VARCHAR(255),
-      created_at VARCHAR(255)
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS inquiries (
-      id VARCHAR(50) PRIMARY KEY,
-      name VARCHAR(255),
-      phone VARCHAR(50),
-      email VARCHAR(255),
-      company_name VARCHAR(255),
-      message TEXT,
-      status VARCHAR(50),
-      admin_notes TEXT,
-      calling_confirmed BOOLEAN DEFAULT FALSE,
-      created_at VARCHAR(255)
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS inquiry_products (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      inquiry_id VARCHAR(50),
-      product_id VARCHAR(50),
-      product_name VARCHAR(255),
-      quantity INT,
-      FOREIGN KEY (inquiry_id) REFERENCES inquiries(id) ON DELETE CASCADE
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS gallery (
-      id VARCHAR(50) PRIMARY KEY,
-      url TEXT,
-      title VARCHAR(255),
-      category VARCHAR(255),
-      created_at VARCHAR(255)
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS testimonials (
-      id VARCHAR(50) PRIMARY KEY,
-      name VARCHAR(255),
-      role VARCHAR(255),
-      company VARCHAR(255),
-      feedback TEXT,
-      rating INT,
-      created_at VARCHAR(255)
-    );
-  `);
-
-  // Seed if admin_credentials table is empty
-  const [rows] = await pool.query<any[]>("SELECT COUNT(*) as count FROM admin_credentials");
-  if (rows[0].count === 0) {
+  // Check if admin credentials collection is empty. If so, seed database.
+  const adminCount = await AdminCredential.countDocuments();
+  if (adminCount === 0) {
     console.log("Seeding database from database.json...");
     const dbPath = path.join(process.cwd(), "database.json");
     let seedData: any;
     if (fs.existsSync(dbPath)) {
       seedData = JSON.parse(fs.readFileSync(dbPath, "utf8"));
     } else {
-      // Fallback seed
+      // Fallback seed data if file doesn't exist
       const salt = bcrypt.genSaltSync(10);
       const hashedPassword = bcrypt.hashSync("password123", salt);
       seedData = {
@@ -207,154 +262,113 @@ export async function initDatabase() {
     }
 
     // Insert admin credentials
-    await pool.query("INSERT INTO admin_credentials (username, password_hash) VALUES (?, ?)", [
-      seedData.credentials.username,
-      seedData.credentials.passwordHash
-    ]);
+    await AdminCredential.create({
+      username: seedData.credentials.username,
+      passwordHash: seedData.credentials.passwordHash
+    });
 
     // Insert settings
     const s = seedData.settings;
-    await pool.query(
-      `INSERT INTO settings (id, company_name, owner_name, phone, email, address, whatsapp_number, facebook_url, twitter_url, linkedin_url, office_hours, announcement)
-       VALUES (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        s.companyName || null,
-        s.ownerName || null,
-        s.phone || null,
-        s.email || null,
-        s.address || null,
-        s.whatsappNumber || null,
-        s.facebookUrl || null,
-        s.twitterUrl || null,
-        s.linkedinUrl || null,
-        s.officeHours || null,
-        s.announcement || null
-      ]
-    );
+    await Setting.create({
+      companyName: s.companyName || null,
+      ownerName: s.ownerName || null,
+      phone: s.phone || null,
+      email: s.email || null,
+      address: s.address || null,
+      whatsappNumber: s.whatsappNumber || null,
+      facebookUrl: s.facebookUrl || null,
+      twitterUrl: s.twitterUrl || null,
+      linkedinUrl: s.linkedinUrl || null,
+      officeHours: s.officeHours || null,
+      announcement: s.announcement || null
+    });
 
     // Insert categories
-    if (seedData.categories) {
-      for (const cat of seedData.categories) {
-        await pool.query("INSERT INTO categories (id, name, slug, description, image) VALUES (?, ?, ?, ?, ?)", [
-          cat.id,
-          cat.name,
-          cat.slug,
-          cat.description,
-          cat.image
-        ]);
-      }
+    if (seedData.categories && seedData.categories.length > 0) {
+      await Category.insertMany(seedData.categories.map((cat: any) => ({
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        description: cat.description,
+        image: cat.image
+      })));
     }
 
     // Insert products
-    if (seedData.products) {
-      for (const prod of seedData.products) {
-        await pool.query(
-          `INSERT INTO products (id, name, category, description, image, price, in_stock, is_featured, pack_size, manufacturer, chemical_formula, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            prod.id,
-            prod.name,
-            prod.category,
-            prod.description,
-            prod.image,
-            prod.price,
-            prod.inStock ? 1 : 0,
-            prod.isFeatured ? 1 : 0,
-            prod.packSize,
-            prod.manufacturer,
-            prod.chemicalFormula || null,
-            prod.createdAt || new Date().toISOString()
-          ]
-        );
-      }
+    if (seedData.products && seedData.products.length > 0) {
+      await Product.insertMany(seedData.products.map((prod: any) => ({
+        id: prod.id,
+        name: prod.name,
+        category: prod.category,
+        description: prod.description,
+        image: prod.image,
+        price: prod.price,
+        inStock: prod.inStock !== undefined ? !!prod.inStock : true,
+        isFeatured: prod.isFeatured !== undefined ? !!prod.isFeatured : false,
+        packSize: prod.packSize,
+        manufacturer: prod.manufacturer,
+        chemicalFormula: prod.chemicalFormula || null,
+        createdAt: prod.createdAt || new Date().toISOString()
+      })));
     }
 
     // Insert customers
-    if (seedData.customers) {
-      for (const cust of seedData.customers) {
-        await pool.query(
-          "INSERT INTO customers (id, name, phone, password, company_name, email, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-          [
-            cust.id,
-            cust.name,
-            cust.phone,
-            cust.password,
-            cust.companyName,
-            cust.email,
-            cust.createdAt || new Date().toISOString()
-          ]
-        );
-      }
+    if (seedData.customers && seedData.customers.length > 0) {
+      await Customer.insertMany(seedData.customers.map((cust: any) => ({
+        id: cust.id,
+        name: cust.name,
+        phone: cust.phone,
+        password: cust.password,
+        companyName: cust.companyName,
+        email: cust.email,
+        createdAt: cust.createdAt || new Date().toISOString()
+      })));
     }
 
     // Insert inquiries
-    if (seedData.inquiries) {
-      for (const inq of seedData.inquiries) {
-        await pool.query(
-          `INSERT INTO inquiries (id, name, phone, email, company_name, message, status, admin_notes, calling_confirmed, created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            inq.id,
-            inq.name,
-            inq.phone,
-            inq.email,
-            inq.companyName,
-            inq.message,
-            inq.status,
-            inq.adminNotes || null,
-            inq.callingConfirmed ? 1 : 0,
-            inq.createdAt || new Date().toISOString()
-          ]
-        );
-
-        if (inq.products) {
-          for (const item of inq.products) {
-            await pool.query(
-              "INSERT INTO inquiry_products (inquiry_id, product_id, product_name, quantity) VALUES (?, ?, ?, ?)",
-              [inq.id, item.productId, item.productName, item.quantity]
-            );
-          }
-        }
-      }
+    if (seedData.inquiries && seedData.inquiries.length > 0) {
+      await Inquiry.insertMany(seedData.inquiries.map((inq: any) => ({
+        id: inq.id,
+        name: inq.name,
+        phone: inq.phone,
+        email: inq.email,
+        companyName: inq.companyName,
+        message: inq.message,
+        status: inq.status || "pending",
+        adminNotes: inq.adminNotes || null,
+        callingConfirmed: inq.callingConfirmed !== undefined ? !!inq.callingConfirmed : false,
+        products: (inq.products || []).map((p: any) => ({
+          productId: p.productId,
+          productName: p.productName,
+          quantity: p.quantity
+        })),
+        createdAt: inq.createdAt || new Date().toISOString()
+      })));
     }
 
     // Insert gallery
-    if (seedData.gallery) {
-      for (const gal of seedData.gallery) {
-        await pool.query("INSERT INTO gallery (id, url, title, category, created_at) VALUES (?, ?, ?, ?, ?)", [
-          gal.id,
-          gal.url,
-          gal.title,
-          gal.category,
-          gal.createdAt || new Date().toISOString()
-        ]);
-      }
+    if (seedData.gallery && seedData.gallery.length > 0) {
+      await GalleryImage.insertMany(seedData.gallery.map((gal: any) => ({
+        id: gal.id,
+        url: gal.url,
+        title: gal.title,
+        category: gal.category,
+        createdAt: gal.createdAt || new Date().toISOString()
+      })));
     }
 
     // Insert testimonials
-    if (seedData.testimonials) {
-      for (const test of seedData.testimonials) {
-        await pool.query(
-          "INSERT INTO testimonials (id, name, role, company, feedback, rating, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-          [
-            test.id,
-            test.name,
-            test.role,
-            test.company,
-            test.feedback,
-            test.rating,
-            test.createdAt || new Date().toISOString()
-          ]
-        );
-      }
+    if (seedData.testimonials && seedData.testimonials.length > 0) {
+      await Testimonial.insertMany(seedData.testimonials.map((test: any) => ({
+        id: test.id,
+        name: test.name,
+        role: test.role,
+        company: test.company,
+        feedback: test.feedback,
+        rating: test.rating,
+        createdAt: test.createdAt || new Date().toISOString()
+      })));
     }
     console.log("Seeding completed successfully.");
   }
-}
-
-export async function query(sql: string, params?: any[]) {
-  if (!pool) {
-    throw new Error("Database pool not initialized. Call initDatabase() first.");
-  }
-  return pool.query(sql, params);
 }

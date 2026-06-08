@@ -86,7 +86,7 @@ function ToastItem({ toast, removeToast }: { toast: ToastMessage; removeToast: (
         <p className="text-[11px] text-editorial-blue/70 font-sans leading-relaxed">
           {toast.message}
         </p>
-      </div>
+      </div> 
 
       <button
         onClick={() => removeToast(toast.id)}
